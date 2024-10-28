@@ -7,14 +7,18 @@ from Reactor_Component_GP_Class import Reactor_Component
 
 class nuc_reactor:
     """Inside needs to be a 9x6 list"""
-    def __init__(self, inside=None) -> None:
+    def __init__(self, inside=None, outside=(0,20)) -> None:
         self.hull_str = 16000
-        self.outside_cooling = 33
         self.internal_heat = 0
         self.energy_output = 0
         self.total_energy_output = 0
 
         self.inside_numbers = [[y+x*9 for y in range(9)] for x in range(6)]
+
+        # Check if 
+        if len(outside) != 2 or sum(outside) > 20:
+            raise ValueError("Must be two numbers whose sum is less than 20")
+        self.outside_cooling = 1 + 6 * 2 + outside[0] * .25 + outside[1]
 
         if not inside:
             self.inside = [[Empty() for y in range(9)] for x in range(6)]
@@ -62,8 +66,11 @@ class nuc_reactor:
             for item in col:
                 item.run()
         self.internal_heat -= self.outside_cooling
+        print(f"The hull self cooled itself by: {self.outside_cooling}, heat is now: {self.internal_heat}")
         if self.internal_heat < 0:
             self.internal_heat = 0
+        if self.internal_heat >= 8000:
+            self.outside_cooling = 18
     
 def recursive_check(items, target_class):
     for item in items:
@@ -75,17 +82,17 @@ def recursive_check(items, target_class):
     return False
 
 A = nuc_reactor([
-    ['C', 'E', 'E', 'H', 'C', 'C', 'C', 'E', 'C'],
-    ['E', 'U', 'U', 'E', 'E', 'E', 'E', 'E', 'E'],
-    ['E', 'U', 'U', 'E', 'E', 'E', 'E', 'E', 'E'],
-    ['E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E'],
-    ['E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E'],
+    ['C', 'H', 'C', 'H', 'C', 'C', 'C', 'H', 'C'],
+    ['H', 'U', 'U', 'C', 'C', 'H', 'C', 'C', 'C'],
+    ['C', 'U', 'U', 'H', 'C', 'C', 'C', 'C', 'H'],
+    ['H', 'C', 'H', 'C', 'C', 'C', 'H', 'C', 'C'],
+    ['C', 'C', 'C', 'C', 'H', 'C', 'C', 'E', 'E'],
     ['E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E']])
 
 for line in A.inside:
     print(line)
 
-print(A.inside[1][1].left, A.inside[1][1].right, A.inside[1][1].up, A.inside[1][1].down)
+# print(A.inside[1][1].left, A.inside[1][1].right, A.inside[1][1].up, A.inside[1][1].down)
 
 while recursive_check(A.inside, Uranium_Cell):
     A.run()

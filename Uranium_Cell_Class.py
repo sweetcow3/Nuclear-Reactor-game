@@ -39,7 +39,7 @@ class Uranium_Cell(Reactor_Component):
         # Distribute heat accordingly
         if coolant_sum == 0:
             self.hull.internal_heat += H
-            print(f"I'm adding {H} heat to the hull here, it is currently {self.hull.internal_heat}")
+            # print(f"I'm adding {H} heat to the hull here, it is currently {self.hull.internal_heat}")
         else:
             if isinstance(self.left, Cooling_Component):
                 self.left.add_primary(H/C)
@@ -52,10 +52,10 @@ class Uranium_Cell(Reactor_Component):
         
     def energy_calc(self) -> int:
         sides = (self.left, self.right, self.up, self.down)
-        U = 5
+        U = 200
         for side in sides:
             if isinstance(side, Uranium_Cell):
-                U += 5
+                U += 200
         return U
 
     def run(self):

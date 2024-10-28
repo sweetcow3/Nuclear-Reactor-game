@@ -40,7 +40,7 @@ class Integrated_Heat_Disperser(Cooling_Component):
                     variables[max_index] -= transfer_amount
                     variables[min_index] += transfer_amount
 
-                    self.internal_heat, self.hull.internal_heat = variables
+                    self.internal_heat, neighbor.internal_heat = variables
 
     
     def __repr__(self) -> str:

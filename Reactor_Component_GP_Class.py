@@ -30,11 +30,11 @@ class Reactor_Component:
         if isinstance(self.left, Reactor_Component):
             self.left.right = Empty()
         if isinstance(self.right, Reactor_Component):
-            self.left.left = Empty()
+            self.right.left = Empty()
         if isinstance(self.up, Reactor_Component):
-            self.left.down = Empty()
+            self.up.down = Empty()
         if isinstance(self.down, Reactor_Component):
-            self.left.up = Empty()
+            self.down.up = Empty()
 
     def run(self):
         pass

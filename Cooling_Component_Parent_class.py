@@ -12,6 +12,7 @@ class Cooling_Component(Reactor_Component):
         super().run()
         if self.internal_heat >= self.max_heat:
             self.self_destruct()
+            print(f"Cooling component at [{self.row}, {self.column}] melted.")
 
     def add_primary(self, value) -> None:
         self.add_heat(value)
