@@ -6,6 +6,10 @@ class Uranium_Cell(Reactor_Component):
         self.name = "Uranium Cell"
         self.health = 10000
 
+    def self_destruct(self):
+        super().self_destruct()
+        self.hull.uranium_check()
+
     def heat_calc(self) -> None:
         U = 0
         coolant_sum = 0

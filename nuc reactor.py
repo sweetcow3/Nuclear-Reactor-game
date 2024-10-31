@@ -8,6 +8,10 @@ from Reactor_Component_GP_Class import Reactor_Component
 class nuc_reactor:
     """Inside needs to be a 9x6 list"""
     def __init__(self, inside=None, outside=(0,20)) -> None:
+        self.category = None
+        self.runtime = 0
+        self.did_anything_selfdestruct = False
+
         self.hull_str = 16000
         self.internal_heat = 0
         self.energy_output = 0
@@ -38,16 +42,29 @@ class nuc_reactor:
                             self.inside[-1].append(Integrated_Reactor_Plating(self, (x,y)))
                         case 'H':
                             self.inside[-1].append(Integrated_Heat_Disperser(self, (x,y)))
+
+        Uranium_cells = 0
+        Sum_of_neighbors = 0
         for col in self.inside:
             for item in col:
                 if isinstance(item, Reactor_Component):
                     item.neighbors()
-        # self.Uranium = []
-        # self.Cooling = []
-        # self.Reactor_Plating = []
-        # self.Heat_Disperser = []
+                    if isinstance(item, Uranium_Cell):
+                        Uranium_cells += 1
+                        Sum_of_neighbors += 1
+                        for N in (item.left, item.right, item.up, item.down):
+                            if isinstance(N, Uranium_Cell):
+                                Sum_of_neighbors += 1
+        self.efficency = Sum_of_neighbors / Uranium_cells if Uranium_cells != 0 else 0
+                                
 
-        # self.scan_inside()
+    def uranium_check(self):
+        if not recursive_check(self.inside, Uranium_Cell):
+            if self.internal_heat <= 100:
+                self.category = "Mark I"
+            else:
+                self.category = "Mark II"
+
 
     def scan_inside(self) -> None:
         for y in range(len(self.inside)):
@@ -62,11 +79,12 @@ class nuc_reactor:
                     self.Heat_Disperser.append([x,y])
 
     def run(self) -> None:
+        self.runtime += 1
         for col in self.inside:
             for item in col:
                 item.run()
         self.internal_heat -= self.outside_cooling
-        print(f"The hull self cooled itself by: {self.outside_cooling}, heat is now: {self.internal_heat}")
+        # print(f"The hull self cooled itself by: {self.outside_cooling}, heat is now: {self.internal_heat}")
         if self.internal_heat < 0:
             self.internal_heat = 0
         if self.internal_heat >= 8000:
@@ -82,25 +100,33 @@ def recursive_check(items, target_class):
     return False
 
 A = nuc_reactor([
-    ['C', 'H', 'C', 'H', 'C', 'C', 'C', 'H', 'C'],
-    ['H', 'U', 'U', 'C', 'C', 'H', 'C', 'C', 'C'],
-    ['C', 'U', 'U', 'H', 'C', 'C', 'C', 'C', 'H'],
-    ['H', 'C', 'H', 'C', 'C', 'C', 'H', 'C', 'C'],
-    ['C', 'C', 'C', 'C', 'H', 'C', 'C', 'E', 'E'],
-    ['E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E']])
+    ['C', 'C', 'H', 'C', 'H', 'C', 'H', 'C', 'C'],
+    ['H', 'C', 'C', 'C', 'U', 'C', 'C', 'C', 'H'],
+    ['C', 'H', 'C', 'H', 'U', 'H', 'C', 'H', 'C'],
+    ['C', 'C', 'C', 'H', 'U', 'H', 'C', 'C', 'C'],
+    ['H', 'C', 'C', 'C', 'U', 'C', 'C', 'C', 'H'],
+    ['C', 'C', 'H', 'C', 'H', 'C', 'H', 'C', 'C']])
 
 for line in A.inside:
     print(line)
-
-# print(A.inside[1][1].left, A.inside[1][1].right, A.inside[1][1].up, A.inside[1][1].down)
 
 while recursive_check(A.inside, Uranium_Cell):
     A.run()
     if A.internal_heat > A.hull_str:
         print("Reactor exploded!")
+        if A.runtime < 1000:
+            A.category = "Mark V"
+        else:
+            if A.did_anything_selfdestruct:
+                A.category = "Mark IV"
+            else:
+                A.category = "Mark III"
         break
 print(f'Heat: {A.internal_heat}')
 print(f'Total Energy Output: {A.total_energy_output}')
 
 for line in A.inside:
     print(line)
+
+print(A.category)
+print(A.efficency)

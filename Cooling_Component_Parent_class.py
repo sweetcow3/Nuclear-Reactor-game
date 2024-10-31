@@ -14,6 +14,10 @@ class Cooling_Component(Reactor_Component):
             self.self_destruct()
             print(f"Cooling component at [{self.row}, {self.column}] melted.")
 
+    def self_destruct(self):
+        super().self_destruct()
+        self.hull.did_anything_selfdestruct = True
+
     def add_primary(self, value) -> None:
         self.add_heat(value)
 
